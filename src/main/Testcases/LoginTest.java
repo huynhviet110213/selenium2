@@ -1,7 +1,10 @@
 import common.Utilities;
 import constant.Constant;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.PageLoadStrategy;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
@@ -9,17 +12,34 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.io.FileReader;
+import java.io.IOException;
+
 public class LoginTest {
     JavascriptExecutor js;
     ChromeOptions chromeOptions;
+    DriverManager driverManager;
+    WebDriver driver;
+
+//    JSONParser jsonParser = new JSONParser();
+//    FileReader reader = new FileReader("Testdata.json");
+//    //Read JSON file
+//    Object obj = jsonParser.parse(reader);
+//
+//    public LoginTest() throws IOException, ParseException {
+//    }
 
     @BeforeMethod
     public void beforeMethod() {
         System.out.println("pre-condition");
-//        System.getProperty("webdriver.chrome.driver", "../chromedriver/chromedriver");
+        // chrome of linux
         System.setProperty("webdriver.chrome.driver", Utilities.getProjectpath() + "/src/main/Executables/chromedriver");
+        // chrome of windown
+//        System.setProperty("webdriver.chrome.driver", Utilities.getProjectpath() + "/src/main/Executables/chromedriver.exe");
+        driverManager = DriverManagerFactory.getDriverManager(DriverType.CHROME);
+        driver.get(Constant.RAILWAY_URL);
         chromeOptions = new ChromeOptions();
-        chromeOptions.setPageLoadStrategy(PageLoadStrategy.NORMAL);
+        chromeOptions.setPageLoadStrategy(PageLoadStrategy.EAGER);
         Constant.WEBDRIVER = new ChromeDriver(chromeOptions);
         Constant.WEBDRIVER.manage().window().maximize();
         js = (JavascriptExecutor) Constant.WEBDRIVER;
@@ -39,7 +59,8 @@ public class LoginTest {
         homePage.open();
         LoginPage loginPage = homePage.goToLoginPage();
         js.executeScript("window.scrollBy(0,500)");
-        String actualMsg = loginPage.loginSuccessfully(Constant.USERNAME, Constant.PASSWORD).getWelcomeMessage();
+        loginPage.HomePage(Constant.USERNAME, Constant.PASSWORD);
+        String actualMsg = homePage.getWelcomeMessage();
         String expectedMsg = "Welcome " + Constant.USERNAME;
         Assert.assertEquals(actualMsg, expectedMsg, "Welcome message is not displayed as expected");
     }
@@ -51,32 +72,43 @@ public class LoginTest {
         homePage.open();
         LoginPage loginPage = homePage.goToLoginPage();
         js.executeScript("window.scrollBy(0,500)");
-        String actualMsg = loginPage.loginUnSuccessfully(Constant.USERNAME, Constant.PASSWORD).getLoginErrorMessage();
+        loginPage.LoginPage(Constant.USERNAME, Constant.PASSWORD);
+        String actualMsg = loginPage.getLoginErrorMessage();
         String expectedMsg = Constant.ERRORMESSAGE;
         Assert.assertEquals(actualMsg, expectedMsg, "Error message is not displayed as expected");
     }
 
-    @Test
-    public void TC03() {
-        System.out.println("TC02 - User can't login to Railway with invalid username");
-        HomePage homePage = new HomePage();
-        homePage.open();
-        LoginPage loginPage = homePage.goToLoginPage();
-        js.executeScript("window.scrollBy(0,500)");
-        String actualMsg = loginPage.usernameInvalid(Constant.USERNAMEINVALD).getErrorEnterUsername();
-        String expectedMsg = Constant.USERNAMEINVALD;
-        Assert.assertEquals(actualMsg, expectedMsg, "Welcome message is not displayed as expected");
-    }
+//    @Test
+//    public void TC03() {
+//        System.out.println("TC02 - User can't login to Railway with invalid username");
+//        HomePage homePage = new HomePage();
+//        homePage.open();
+//        LoginPage loginPage = homePage.goToLoginPage();
+//        js.executeScript("window.scrollBy(0,500)");
+//        String actualMsg = loginPage.usernameInvalid(Constant.USERNAMEINVALD).getErrorEnterUsername();
+//        String expectedMsg = Constant.USERNAMEINVALD;
+//        Assert.assertEquals(actualMsg, expectedMsg, "Welcome message is not displayed as expected");
+//    }
 
-    @Test
-    public void TC04() {
-        System.out.println("TC02 - User can't login to Railway with invalid password");
-        HomePage homePage = new HomePage();
-        homePage.open();
-        LoginPage loginPage = homePage.goToLoginPage();
-        js.executeScript("window.scrollBy(0,500)");
-        String actualMsg = loginPage.passwordInvalid(Constant.PASSWORDINVALD).getErrorEnterPassword();
-        String expectedMsg = Constant.PASSWORDINVALD;
-        Assert.assertEquals(actualMsg, expectedMsg, "Welcome message is not displayed as expected");
-    }
+//    @Test
+//    public void TC04() {
+//        System.out.println("TC02 - User can't login to Railway with invalid password");
+//        HomePage homePage = new HomePage();
+//        homePage.open();
+//        LoginPage loginPage = homePage.goToLoginPage();
+//        js.executeScript("window.scrollBy(0,500)");
+//        String actualMsg = loginPage.passwordInvalid(Constant.PASSWORDINVALD).getErrorEnterPassword();
+//        String expectedMsg = Constant.PASSWORDINVALD;
+//        Assert.assertEquals(actualMsg, expectedMsg, "Welcome message is not displayed as expected");
+//    }
+
+
+//    @SuppressWarnings("unchecked")
+//    public void readWriteJSON() throws InterruptedException, IOException, ParseException {
+//        JSONParser jsonParser = new JSONParser();
+//        try {
+//            FileReader reader = new FileReader("../testdata.json")
+//        }
+//    }
+
 }
